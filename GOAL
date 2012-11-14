@@ -1,0 +1,47 @@
+
+cloudstack_server { 'host_name':
+  host_name      => 'host_name',
+  service_name   => 'service_name',
+  zone_name      => 'zone_name',
+  network_names  => ['network_name'],
+  account_name   => 'account_name',
+  account_domain => 'account_domain',
+  group          => 'group',
+}
+
+
+
+define local_cloudstack_server (
+  $host_name = $name,
+  $service_name,
+  $template_name,
+  $zone_name = undef,
+  $network_names = [],
+  $account_name = undef,
+  $account_domain = undef,
+  $work_label = undef,
+  $dtap_stage = undef
+) {
+
+  $group = structure2json( {
+    work_label => $work_label,
+   $dtap_stage => dtap_stage
+  } )
+
+  cloudstack_server { $host_name:
+    service_name   => $service_name,
+    zone_name      => $zone_name,
+    network_names  => $network_names,
+    account_name   => $account_name,
+    account_domain => $account_domain,
+    group          => $group,
+  }
+
+}
+
+
+more goals
+
+- list default settings?
+- associate and disassociate ips
+- port forwarding rules?
