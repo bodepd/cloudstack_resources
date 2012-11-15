@@ -1,6 +1,6 @@
-== About
+## About
 
-== Setting up auth credentials.
+## Setting up auth credentials.
 
 your credentials should be stored in a file called transport.yaml in your puppet conf dir.
 
@@ -8,35 +8,38 @@ your credentials should be stored in a file called transport.yaml in your puppet
 puppet.conf lives)
 
 Project that create Puppet resource's for modeling CloudStack objects.
-cloudstack:
-  api_key: 'api_key'
-  secret_access_key: ecret_key'
-  host: '127.0.0.1'
-  port: '8080'
-  path: '/client/api'
-  scheme: 'http'
 
-== querying for resources, now you can use puppet resource to do all kinds of stuff
+    cloudstack:
+      api_key: 'api_key'
+      secret_access_key: ecret_key'
+      host: '127.0.0.1'
+      port: '8080'
+      path: '/client/api'
+      scheme: 'http'
 
-* list zones
+## querying for resources, now you can use puppet resource to do all kinds of stuff
 
-puppet resource cloudstack_zone
+#### list zones
 
-* list flavors
+    puppet resource cloudstack_zone
 
-puppet resource cloudstack_flavor
+#### list flavors
 
-* list images
+    puppet resource cloudstack_flavor
 
-puppet resource cloudstack_image
+#### list images
 
-* list networks
+    puppet resource cloudstack_image
 
-puppet resource cloudstack_network
+#### list networks
 
-* list instances
+    puppet resource cloudstack_network
 
-puppet resource cloudstack_instnace
+#### list instances
+
+    puppet resource cloudstack_instanace
+
+## manaing instances as resources in Puppet's DSL
 
 check the file tests/example.pp, it shows how to create instances as resources,
 only resources support being managed at the moment.
