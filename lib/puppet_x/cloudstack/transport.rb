@@ -13,7 +13,7 @@ module Puppet_x
       end
 
       def self.retrieve(catalog=nil)
-        if (catalog and transport_resorce = catalog.resource.select {|x| x.type.downcase == 'loudstack_transport' })
+        if (catalog and transport_resorce = catalog.resource.select {|x| x.type.downcase == 'cloudstack_transport' })
           raise(Puppet::Error, "Found multiple cloudstack transports") if (transport_resource.size > 1)
           options = transport_resource.first.to_hash
         else

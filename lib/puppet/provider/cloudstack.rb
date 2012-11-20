@@ -61,13 +61,19 @@ class Puppet::Provider::CloudStack < Puppet::Provider
 
   def get_id_from_request(name, type, options={})
     all_objects = connection.send("list_#{type}s", options)["list#{type}sresponse"][type]
-    matching = all_objects.select {|x| x['name'] == name }
-    if matching.size > 1
+    matching_ids = all_objects.collect do |x|
+      if (x['name'] == name)
+        x['id']
+      else
+        nil
+      end
+    end.compact.uniq
+    if matching_ids.size > 1
       raise(Puppet::Error, "Found multiple #{type} matching:\"#{name}\", Puppet expects this to be unique. Failing.")
-    elsif matching.empty?
+    elsif matching_ids.empty?
         raise(Puppet::Error, "Did not find a #{type} mathing: \"#{name}\". Failing.")
     else
-      matching.first['id']
+      matching_ids.first
     end
   end
 
