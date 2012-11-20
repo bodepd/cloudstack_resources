@@ -16,9 +16,9 @@
 
 # I need a basic zone to deploy this into
 
-cloudstack_security_group { 'foo':
-  ensure => present,
-}
+#cloudstack_security_group { 'foo':
+#  ensure => present,
+#}
 
 #volume {
 #
@@ -28,9 +28,9 @@ resources { 'cloudstack_instance':
   purge => true
 }
 
-ssh_transport {
-
-}
+# ssh_transport {
+#
+# }
 
 cloudstack_instance { 'foo1':
   ensure     => present,
@@ -43,14 +43,16 @@ cloudstack_instance { 'foo1':
   # hostname
 }
 
-
-cloudstack_ssh {
-  classes => {}
-  modules => []
-  ssh_transport =>
-  machine => Cloudstack_instnace['foo1'],
-  type => 'agent'
 }
+
+
+#cloudstack_ssh {
+#  classes => {}
+#  modules => []
+#  ssh_transport =>
+#  machine => Cloudstack_instnace['foo1'],
+#  type => 'agent'
+#}
 
 #
 # should I create a domain?

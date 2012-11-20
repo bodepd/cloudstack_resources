@@ -63,6 +63,10 @@ Puppet::Type.type(:cloudstack_instance).provide(
    connection.servers.destroy(@property_hash[:id])
   end
 
+  def internal_ipaddress
+    return @property_hash[:internal_ipaddress] if @property_hash[:internal_ipaddress]
+
+  end
   # perform adhoc state changes
   def state=(state)
      if state == 'running'
