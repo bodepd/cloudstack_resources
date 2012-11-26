@@ -11,7 +11,7 @@ Project that create Puppet resource's for modeling CloudStack objects.
 
     cloudstack:
       api_key: 'api_key'
-      secret_access_key: ecret_key'
+      secret_access_key: 'secret_key'
       host: '127.0.0.1'
       port: '8080'
       path: '/client/api'
