@@ -51,6 +51,17 @@ Puppet::Type.type(:cloudstack_keypair).provide(
     connection.delete_ssh_key_pair(resource[:name])
   end
 
+  def privatekey
+    if fingerprint
+      File.read(key_file_path(fingerprint))
+    else
+      fail('Expected fingerprint to be set')
+    end
+  end
+
+  def fingerprint
+    @property_hash[:fingerprint]
+  end
 
   def key_file_path(fingerprint_arg=fingerprint)
     File.join(Puppet[:confdir], 'cloudstack', 'keypair', fingerprint_arg, 'id_rsa')
