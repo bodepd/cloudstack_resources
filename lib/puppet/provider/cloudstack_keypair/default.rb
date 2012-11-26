@@ -33,7 +33,7 @@ Puppet::Type.type(:cloudstack_keypair).provide(
       if resource['key_file']
         key_file = resource[:key_file]
       else
-        key_file = File.join(Puppet[:confdir], 'cloudstack', 'keypair', response['fingerprint'], 'id_rsa')
+        key_file = key_file_path(response['fingerprint'])
       end
       FileUtils.mkdir_p(File.dirname(key_file))
       if File.exists?(key_file)
@@ -49,6 +49,22 @@ Puppet::Type.type(:cloudstack_keypair).provide(
 
   def destroy
     connection.delete_ssh_key_pair(resource[:name])
+  end
+
+  def privatekey
+    if fingerprint
+      File.read(key_file_path(fingerprint))
+    else
+      fail('Expected fingerprint to be set')
+    end
+  end
+
+  def fingerprint
+    @property_hash[:fingerprint]
+  end
+
+  def key_file_path(fingerprint_arg=fingerprint)
+    File.join(Puppet[:confdir], 'cloudstack', 'keypair', fingerprint_arg, 'id_rsa')
   end
 
   def flush

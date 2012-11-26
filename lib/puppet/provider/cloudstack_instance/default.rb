@@ -25,6 +25,7 @@ Puppet::Type.type(:cloudstack_instance).provide(
           :domain             => server.domain_name,
           :host               => server.host_name,
           :state              => server.state.downcase,
+          :group              => server.group,
           #:keypair            => server.keypair,
           :ensure             => :present
           # I may want to print network information here
@@ -39,8 +40,8 @@ Puppet::Type.type(:cloudstack_instance).provide(
     end
     flavor_id  = get_flavor_id(resource[:flavor])
     zone_id    = get_zone_id(resource[:zone])
-    image_id   = get_image_id(resource[:image])
-    network_id = resource[:network] ? get_network_id(resource[:network]): nil
+    image_id   = get_image_id(resource[:image], zone_id)
+    network_id = resource[:network] ? get_network_id(resource[:network], zone_id): nil
     Puppet.debug("Bootstrapping instance with:
       :display_name      => #{resource[:name]},
       :image_id          => #{image_id},
@@ -53,7 +54,8 @@ Puppet::Type.type(:cloudstack_instance).provide(
       :image_id          => image_id,
       :flavor_id         => flavor_id,
       :zone_id           => zone_id,
-      :network_ids       => network_id
+      :network_ids       => network_id,
+      :group             => resource[:group]
       #:keypair           => resource[:keypair]
     )
   end
@@ -67,6 +69,7 @@ Puppet::Type.type(:cloudstack_instance).provide(
     return @property_hash[:internal_ipaddress] if @property_hash[:internal_ipaddress]
 
   end
+
   # perform adhoc state changes
   def state=(state)
      if state == 'running'
@@ -77,6 +80,10 @@ Puppet::Type.type(:cloudstack_instance).provide(
        connection.reboot_virtual_machine(:id => @property_hash[:id])
      end
      @property_hash[:state] = state
+  end
+
+  def group
+    @property_hash[:group]
   end
 
   def network
@@ -90,12 +97,12 @@ Puppet::Type.type(:cloudstack_instance).provide(
   end
 
   # this uses the request object and not the connection object...
-  def get_image_id(name)
+  def get_image_id(name, zone_id)
     get_id_from_request(name, 'template', 'templatefilter' => 'executable')
   end
 
-  def get_network_id(name)
-    get_id_from_request(name, 'network')
+  def get_network_id(name, zone_id)
+    get_id_from_request(name, 'network', 'zoneid' => zone_id)
   end
 
   def get_zone_id(name)
