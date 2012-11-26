@@ -43,6 +43,15 @@ cloudstack_instance { 'foo1':
   # hostname
 }
 
+cloudstack_instance { 'foo2':
+  ensure     => present,
+  flavor     => 'Small Instance',
+  zone       => 'FMT-ACS-001',
+  image      => 'CentOS 5.6(64-bit) no GUI (XenServer)',
+  network    => 'puppetlabs-network',
+  group      => 'foo2',
+}
+
 }
 
 
