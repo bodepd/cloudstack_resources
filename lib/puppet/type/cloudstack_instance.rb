@@ -45,6 +45,10 @@ Puppet::Type.newtype(:cloudstack_instance) do
     desc 'name of zone'
   end
 
+  newproperty(:group) do
+    desc 'group of system'
+  end
+
   newproperty(:network) do
     desc 'name of network the instance belongs to'
   end
@@ -73,6 +77,7 @@ Puppet::Type.newtype(:cloudstack_instance) do
       return false
     end
   end
+
 
   # this causes querying the resources to fail ;(
   #validate do
