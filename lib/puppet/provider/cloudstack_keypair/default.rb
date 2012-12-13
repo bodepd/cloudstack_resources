@@ -67,8 +67,8 @@ Puppet::Type.type(:cloudstack_keypair).provide(
     File.join(Puppet[:confdir], 'cloudstack', 'keypair', fingerprint_arg, 'id_rsa')
   end
 
-  def flush
-    @property_hash = resource.to_hash
-  end
+#  def flush
+#    @property_hash = resource.to_hash
+#  end
 
 end
