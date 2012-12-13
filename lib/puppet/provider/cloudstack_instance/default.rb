@@ -29,6 +29,8 @@ Puppet::Type.type(:cloudstack_instance).provide(
           :host               => server.host_name,
           :state              => server.state.downcase,
           :group              => server.group,
+          # for some reason the keypair does not seem to be returned from listvminstnaces
+          :keypair            => server.key_pair,
           #:keypair            => server.keypair,
           :ensure             => :present
           # I may want to print network information here
@@ -50,14 +52,16 @@ Puppet::Type.type(:cloudstack_instance).provide(
       :image_id          => #{image_id},
       :flavor_id         => #{flavor_id},
       :zone_id           => #{zone_id},
-      :network_ids       => #{network_id}
+      :network_ids       => #{network_id},
+      :keypair           => #{resource[:keypair]},
     ")
-    connection.servers.bootstrap(
+    response = connection.servers.bootstrap(
       :display_name      => resource[:name],
       :image_id          => image_id,
       :flavor_id         => flavor_id,
       :zone_id           => zone_id,
       :network_ids       => network_id,
+      :key_pair           => resource[:keypair],
       :group             => resource[:group]
       #:keypair           => resource[:keypair]
     )
