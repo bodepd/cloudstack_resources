@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# script that performs classification using puppet apply
+#
+
+set -u
+set -e
+
+<% if options['install_puppet'] %>
+<%= ERB.new(File.read(find_template('fragments/install_poss')), nil, "<>", '_install_poss').result(binding) %>
+<% end %>
+
+<%= ERB.new(File.read(find_template('fragments/install_poss')), nil, "<>", '_install_poss').result(binding) %>

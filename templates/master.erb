@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# script that builds a puppet master using puppet apply
+#
+
+set -u
+set -e
+
+mkdir -p /etc/puppet/modules
+pushd /etc/puppet/modules
+
+<%= ERB.new(File.read(find_template('fragments/options')), nil, "<>", '_options').result(binding) %>

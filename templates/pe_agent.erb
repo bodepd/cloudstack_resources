@@ -1,0 +1,11 @@
+#! /bin/bash
+set -x
+set -e
+set -u
+
+echo "Installation script has started..."
+
+<%= ERB.new(File.read(find_template('fragments/install_pe')), nil, "<>", '_install_pe').result(binding) %>
+<%= ERB.new(File.read(find_template('fragments/options')), nil, "<>", '_options').result(binding) %>
+
+puppet agent --pluginsync --test --certname=<%= options['certname'] %> --server=<%= options['puppetmaster'] %> | tee /tmp/puppet_output.log

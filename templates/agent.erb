@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# script that performs classification using puppet agent
+#
+
+set -u
+set -e
+
+<%= ERB.new(File.read(find_template('fragments/options')), nil, "<>", '_options').result(binding) %>
+
+puppet agent --pluginsync --test --certname=<%= options['certname'] %> --server=<%= options['puppetmaster'] %> | tee /tmp/puppet_output.log

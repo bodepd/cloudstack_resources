@@ -1,0 +1,10 @@
+# Figure out if we have wget or curl
+if which wget >/dev/null; then
+  http_get="wget --no-check-certificate --output-document=- --quiet"
+elif which curl >/dev/null; then
+  http_get="curl -o -"
+else
+  echo "Error: could not find wget or curl on the remote system."
+  echo "To install Puppet Enterprise using HTTP, wget or curl are required"
+  exit 1
+fi
