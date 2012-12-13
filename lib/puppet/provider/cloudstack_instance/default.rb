@@ -9,7 +9,10 @@ Puppet::Type.type(:cloudstack_instance).provide(
   def self.instances
     # I may need to fail if the server does not have a name?
     connection.servers.collect do |server|
-      if server.state != 'Destroyed'
+      #require 'ruby-debug';debugger
+      if (server.state != 'Destroyed') and (server.state != 'Stopping')
+      Puppet.debug("Found #{server.display_name} in state: #{server.state}")
+        Puppet.debug("Found #{server.display_name} in state: #{server.state}")
         if server.nics.size > 1
           raise(Puppet::Error, "Does not support dual nics (it is just a prototype")
         end
