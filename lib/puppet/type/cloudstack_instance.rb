@@ -78,6 +78,10 @@ Puppet::Type.newtype(:cloudstack_instance) do
     end
   end
 
+  newparam(:userdata) do
+    desc 'used to set userdata when an instance is created'
+  end
+
 
   # this causes querying the resources to fail ;(
   #validate do
