@@ -53,7 +53,13 @@ Puppet::Type.type(:cloudstack_keypair).provide(
 
   def privatekey
     if fingerprint
-      File.read(key_file_path(fingerprint))
+      key_file = key_file_path(fingerprint)
+      if File.exists?(key_file)
+        File.read(key_file)
+      else
+        Puppet.notice("Could not find locally cached private key for #{resource[:name]}")
+        nil
+      end
     else
       fail('Expected fingerprint to be set')
     end
