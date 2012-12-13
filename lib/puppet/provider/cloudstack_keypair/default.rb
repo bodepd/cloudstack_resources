@@ -41,6 +41,7 @@ Puppet::Type.type(:cloudstack_keypair).provide(
       end
       Puppet.info("Writing your private key to #{key_file}")
       File.new(key_file, 'w').write(response['privatekey'])
+      File.chmod(0600, key_file)
     end
     @property_hash[:fingerprint] = response['fingerprint']
     @property_hash[:privatekey]  = response['privatekey']
