@@ -8,8 +8,7 @@ Puppet::Type.type(:cloudstack_keypair).provide(
 
   def self.instances
     # I may need to fail if the server does not have a name?
-    connection.list_ssh_key_pairs['listsshkeypairsresponse']['sshkeypair'].collect do |keypair|
-      #require 'ruby-debug';debugger
+    (connection.list_ssh_key_pairs['listsshkeypairsresponse']['sshkeypair'] || []).collect do |keypair|
       new(
         :name        => keypair['name'],
         :fingerprint => keypair['fingerprint'],
