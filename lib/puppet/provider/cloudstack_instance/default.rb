@@ -61,11 +61,14 @@ Puppet::Type.type(:cloudstack_instance).provide(
       :group             => resource[:group]
       #:keypair           => resource[:keypair]
     )
+    @property_hash[:ensure] = :present
+    @property_hash[:internal_ipaddress] = response.nics.first['ipaddress']
   end
 
   def destroy
    # TODO need to block until delete is completed
-   connection.servers.destroy(@property_hash[:id])
+    connection.servers.destroy(@property_hash[:id])
+    @property_hash[:ensure] = :absent
   end
 
   def internal_ipaddress
