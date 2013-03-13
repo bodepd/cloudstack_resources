@@ -37,9 +37,9 @@ Project that create Puppet resource's for modeling CloudStack objects.
 
 #### list instances
 
-    puppet resource cloudstack_instanace
+    puppet resource cloudstack_instance
 
-## manaing instances as resources in Puppet's DSL
+## managing instances as resources in Puppet's DSL
 
 check the file tests/example.pp, it shows how to create instances as resources,
 only resources support being managed at the moment.
