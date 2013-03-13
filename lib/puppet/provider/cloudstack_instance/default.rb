@@ -9,7 +9,6 @@ Puppet::Type.type(:cloudstack_instance).provide(
   def self.instances
     # I may need to fail if the server does not have a name?
     connection.servers.collect do |server|
-      #require 'ruby-debug';debugger
       if (server.state != 'Destroyed') and (server.state != 'Stopping')
       Puppet.debug("Found #{server.display_name} in state: #{server.state}")
         Puppet.debug("Found #{server.display_name} in state: #{server.state}")
@@ -31,7 +30,6 @@ Puppet::Type.type(:cloudstack_instance).provide(
           :group              => server.group,
           # for some reason the keypair does not seem to be returned from listvminstnaces
           :keypair            => server.key_pair,
-          #:keypair            => server.keypair,
           :ensure             => :present
           # I may want to print network information here
          )
@@ -61,9 +59,8 @@ Puppet::Type.type(:cloudstack_instance).provide(
       :flavor_id         => flavor_id,
       :zone_id           => zone_id,
       :network_ids       => network_id,
-      :key_pair           => resource[:keypair],
+      :key_pair          => resource[:keypair],
       :group             => resource[:group]
-      #:keypair           => resource[:keypair]
     )
     @property_hash[:ensure] = :present
     @property_hash[:internal_ipaddress] = response.nics.first['ipaddress']
