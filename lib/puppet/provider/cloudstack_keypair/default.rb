@@ -17,6 +17,10 @@ Puppet::Type.type(:cloudstack_keypair).provide(
     end
   end
 
+  def exists?
+    @property_hash[:ensure] == :present
+  end
+
   def create
     #domain_id  = get_domain_id(resource[:domain])
     #project_id    = get_project_id(resource[:project])
