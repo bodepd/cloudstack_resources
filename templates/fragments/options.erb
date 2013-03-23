@@ -2,6 +2,13 @@
 
 # install git and rubygems
 apt-get update || true
+
+# install epel
+if [ -f /etc/redhat-release ]; then
+  puppet module install stahnma/epel
+  puppet apply -e 'include epel'
+fi
+
 apt-get install -y git-core || yum install -y git
 apt-get install -y rubygems || yum install -y rubygems
 
@@ -34,12 +41,12 @@ return=$?
 #This fuction is not called if no custom facts are given
 #
 #The Puppet Labs' stdlib module is required for this to work
-#It can be installed using: 
+#It can be installed using:
 # 'puppet-module install puppetlabs/stdlib'
 mkdir -p /etc/facter/facts.d
-<% if options[:facts] %>
+<% if options['facts'] %>
 echo "Installing custom facts"
-<% options[:facts].each do |fact,value| %>
+<% options['facts'].each do |fact,value| %>
 echo <%= fact %>=<%= value %> > /etc/facter/facts.d/<%= fact %>.txt
 <% end %>
 <% end %>

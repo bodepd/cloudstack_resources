@@ -40,9 +40,11 @@ Puppet::Type.type(:puppet_node).provide(:ssh) do
 
     if script_name == 'pe_master'
       answers = 'https://raw.github.com/gist/4229037/d03453ae789797909745b63d44611adc5090c050/gistfile1.txt'
+      modulepath = '/etc/puppetlabs/puppet/modules'
     elsif script_name == 'pe_agent'
       answers = 'https://raw.github.com/gist/3299812/9dea06dba93d218c61e5fa9d9e928a265c137239/answers'
     else
+      modulepath = '/etc/puppet/modules'
       Puppet.debug("Script name: #{script_name} does not need an answers file")
     end
 
@@ -59,7 +61,8 @@ Puppet::Type.type(:puppet_node).provide(:ssh) do
       'answers_payload'   => answers,
       'certname'          => machinehostname(resource[:machine]),
       'puppetmaster'      => machinehostname(resource[:puppetmaster]),
-      'facts'             => 'classes' => resource['classes'].to_pson
+      'facts'             => {'classes' => resource['classes'].to_pson},
+      'modulepath'        => modulepath
     }
 
     Puppet.debug("Compiling script #{script_name} with options:\n#{compile_options.inspect}")
@@ -93,7 +96,7 @@ Puppet::Type.type(:puppet_node).provide(:ssh) do
     if key =~ /(Cloudstack_keypair\[(\S+)?\])/
       return model.catalog.resource($1).provider.key_file_path
     else
-      puts 'It is a path'
+     puts 'It is a path'
       return key
     end
     key

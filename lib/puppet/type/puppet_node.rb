@@ -10,16 +10,8 @@ Puppet::Type.newtype(:puppet_node) do
     desc 'classes to apply to the node. Only makes sense for an agent'
   end
 
-  newparam(:machine) do
-    desc 'machine where puppet actions are performed. Takes a reference or a hostname/ipaddress'
-  end
-
   newproperty(:modules) do
     desc 'modules to install from the forge (only makes sense for a master role'
-  end
-
-  newparam(:keypair) do
-    desc 'keypair to use to connect'
   end
 
   newproperty(:role) do
@@ -46,6 +38,27 @@ Puppet::Type.newtype(:puppet_node) do
   newparam(:facts) do
     desc 'hash of facts that can be used to set instance role'
     defaultto {}
+  end
+
+  newparam(:keypair) do
+    desc 'keypair to use to connect'
+    validate do |value|
+      unless value.to_s =~ /^Cloudstack_keypair\[(\S+)\]/
+        fail("#{value} is not a valid keypair reference, expected Cloudstack_keypair[<name>]")
+      end
+    end
+  end
+
+  newparam(:machine) do
+    desc 'machine where puppet actions are performed. Takes a reference or a hostname/ipaddress'
+  end
+
+  autorequire(:cloudstack_keypair) do
+    if self[:keypair].to_s =~ /^Cloudstack_keypair\[(\S+)\]/
+      [$1]
+    else
+      []
+    end
   end
 
   autorequire(:cloudstack_instance) do
