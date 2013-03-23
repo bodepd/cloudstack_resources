@@ -1,0 +1,66 @@
+<%= ERB.new(File.read(find_template('fragments/set_http_get')), nil, "<>", '_o_set_http_get').result(binding) %>
+
+# install git and rubygems
+apt-get update || true
+
+# install epel
+if [ -f /etc/redhat-release ]; then
+  puppet module install stahnma/epel
+  puppet apply -e 'include epel'
+fi
+
+apt-get install -y git-core || yum install -y git
+apt-get install -y rubygems || yum install -y rubygems
+
+# clone git repos
+<% (options['git_repos'] || {}).each do |source, target| %>
+mkdir -p <%= target %> || true
+git clone <%= source %> <%= target %>
+<% end %>
+
+# switch into specified branches
+<% (options['git_checkout'] || {}).each do |dir, branch| %>
+pushd <%= dir %>
+git checkout <%= branch %>
+popd
+<% end %>
+
+# cp files from modules to system locations
+<% (options['cp_files'] || {}).each do |source, target| %>
+cp <%= source %> <%= target %>
+<% end %>
+
+# if a manifest was specified apply it
+<% if options['manifest'] %>
+mkdir -p /var/lib/puppet_client
+# <%= options.inspect %>
+puppet apply --vardir /var/lib/puppet_client --trace --verbose <%= options['manifest'] %> --certname=<%= options['certname'] %> | tee /tmp/puppet_output.log
+return=$?
+<% end %>
+
+#This fuction is not called if no custom facts are given
+#
+#The Puppet Labs' stdlib module is required for this to work
+#It can be installed using:
+# 'puppet-module install puppetlabs/stdlib'
+mkdir -p /etc/facter/facts.d
+<% if options['facts'] %>
+echo "Installing custom facts"
+<% options['facts'].each do |fact,value| %>
+echo <%= fact %>=<%= value %> > /etc/facter/facts.d/<%= fact %>.txt
+<% end %>
+<% end %>
+
+# upload and run postinstall scripts
+<% [options['postinstall']].flatten.compact.each do |script| %>
+POSTINSTALL=/tmp/postinstall
+<% if script.match(%r{[a-zA-Z0-9]://}) %>
+$http_get '<%= script %>' > $POSTINSTALL
+<% else %>
+cat > "$POSTINSTALL" <<-EOF_STACKBUILDER_POSTINSTALL
+<%= heredoc_safe(File.read(script)) %>
+EOF_STACKBUILDER_POSTINSTALL
+<% end %>
+chmod a+x "$POSTINSTALL"
+"$POSTINSTALL"
+<% end %>

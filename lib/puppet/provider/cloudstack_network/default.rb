@@ -9,7 +9,7 @@ Puppet::Type.type(:cloudstack_network).provide(
   mk_resource_methods
 
   def self.instances
-    connection.list_networks['listnetworksresponse']['network'].collect do |net|
+    (connection.list_networks['listnetworksresponse']['network'] || []).collect do |net|
       new(
         :name     => net['name'],
         :id       => net['id'],

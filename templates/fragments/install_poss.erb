@@ -1,0 +1,88 @@
+fedora_repo()
+{
+	cat >/etc/yum.repos.d/puppet.repo <<-EOFYUMREPO
+		[puppetlabs]
+		name = Puppetlabs
+		baseurl = http://yum.puppetlabs.com/fedora/f$releasever/products/$basearch/
+		gpgcheck = 1
+		enabled = 1
+		gpgkey = http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
+	EOFYUMREPO
+}
+
+el_repo()
+{
+	cat >/etc/yum.repos.d/puppet.repo <<-EOFYUMREPO
+		[puppetlabs]
+		name = Puppetlabs
+		baseurl = http://yum.puppetlabs.com/el/$releasever/products/$basearch/
+		gpgcheck = 1
+		enabled = 1
+		gpgkey = http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
+	EOFYUMREPO
+}
+
+rpm_install()
+{
+	# Setup the yum Puppet repository
+	rpm -q fedora-release && fedora_repo || el_repo
+
+	# Install git
+	yum install -y git
+
+	# Install Puppet from yum.puppetlabs.com
+	yum install -y puppet
+}
+
+apt_install()
+{
+	# Download and install the puppetlabs apt public
+	apt-key adv --recv-key --keyserver pool.sks-keyservers.net 4BD6EC30
+
+	# We need to grab the distro and release in order to populate
+	# the apt repo details. We are assuming that the lsb_release command
+	# will be available as even puppet evens has it (lsb_base) package as
+	# dependancy.
+
+	# Since puppet requires lsb-release I believe this is ok to use for
+	# the purpose of distro and release discovery.
+	apt-get update
+	apt-get -y install git-core
+	apt-get -y install lsb-release
+	distro=$(lsb_release -i | cut -f 2 | tr "[:upper:]" "[:lower:]")
+	release=$(lsb_release -c | cut -f 2)
+
+	# Setup the apt Puppet repository
+	cat > /etc/apt/sources.list.d/puppetlabs.list <<-EOFAPTREPO
+		deb http://apt.puppetlabs.com/${distro}/ ${release} main
+	EOFAPTREPO
+
+	# Install Puppet from Debian repositories
+	apt-get update
+	apt-get -y install puppet
+	apt-get install -y git-core
+	apt-get install -y rubygems
+}
+
+install_puppet()
+{
+	case "${osfamily}" in
+		"redhat")
+			rpm_install ;;
+		"debian")
+			apt_install ;;
+	esac
+}
+
+# install puppet
+if [ -f /etc/redhat-release ]; then
+	export osfamily='redhat'
+elif [ -f /etc/debian_version ]; then
+	export osfamily='debian'
+else
+	echo "This OS is not supported by Puppet Cloud Provisioner"
+	exit 1
+fi
+
+install_puppet
+echo "Puppet installation finished!"

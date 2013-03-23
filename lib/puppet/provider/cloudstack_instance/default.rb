@@ -9,7 +9,9 @@ Puppet::Type.type(:cloudstack_instance).provide(
   def self.instances
     # I may need to fail if the server does not have a name?
     connection.servers.collect do |server|
-      if server.state != 'Destroyed'
+      if (server.state != 'Destroyed') and (server.state != 'Stopping')
+      Puppet.debug("Found #{server.display_name} in state: #{server.state}")
+        Puppet.debug("Found #{server.display_name} in state: #{server.state}")
         if server.nics.size > 1
           raise(Puppet::Error, "Does not support dual nics (it is just a prototype")
         end
@@ -26,7 +28,8 @@ Puppet::Type.type(:cloudstack_instance).provide(
           :host               => server.host_name,
           :state              => server.state.downcase,
           :group              => server.group,
-          #:keypair            => server.keypair,
+          # for some reason the keypair does not seem to be returned from listvminstnaces
+          :keypair            => server.key_pair,
           :ensure             => :present
           # I may want to print network information here
          )
@@ -47,22 +50,26 @@ Puppet::Type.type(:cloudstack_instance).provide(
       :image_id          => #{image_id},
       :flavor_id         => #{flavor_id},
       :zone_id           => #{zone_id},
-      :network_ids       => #{network_id}
+      :network_ids       => #{network_id},
+      :keypair           => #{resource[:keypair]},
     ")
-    connection.servers.bootstrap(
+    response = connection.servers.bootstrap(
       :display_name      => resource[:name],
       :image_id          => image_id,
       :flavor_id         => flavor_id,
       :zone_id           => zone_id,
       :network_ids       => network_id,
+      :key_pair          => resource[:keypair],
       :group             => resource[:group]
-      #:keypair           => resource[:keypair]
     )
+    @property_hash[:ensure] = :present
+    @property_hash[:internal_ipaddress] = response.nics.first['ipaddress']
   end
 
   def destroy
    # TODO need to block until delete is completed
-   connection.servers.destroy(@property_hash[:id])
+    connection.servers.destroy(@property_hash[:id])
+    @property_hash[:ensure] = :absent
   end
 
   def internal_ipaddress

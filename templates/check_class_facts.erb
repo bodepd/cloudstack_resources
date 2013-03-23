@@ -1,0 +1,12 @@
+#!/bin/sh
+set -x
+set -e
+set -u
+
+echo 'Checking if pe is installed'
+
+if [ -f /etc/facts.d/classes]; then
+  cat /etc/facts.d/classes.txt
+else
+  exit 1
+fi
